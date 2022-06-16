@@ -91,5 +91,6 @@ class Agent:
 
         self.state = new_state
         if done:
+            print('env done, reset !')
             self.reset()
         return reward, done

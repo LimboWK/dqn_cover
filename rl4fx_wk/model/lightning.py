@@ -29,7 +29,7 @@ class DQNLightning(LightningModule):
         batch_size: int = 16,
         lr: float = 1e-2,
         gamma: float = 0.99,
-        sync_rate: int = 10,
+        sync_rate: int = 100,
         replay_size: int = 1000,
         warm_start_size: int = 1000,
         eps_last_frame: int = 1000,
@@ -207,8 +207,8 @@ class DQNLightning(LightningModule):
             "steps": torch.tensor(self.global_step).to(device),
             "total_reward": torch.tensor(self.total_reward).to(device),
         }"""
-        # self.log("total_reward", self.total_reward, prog_bar=True)
-        # self.log("steps", self.global_step, logger=False, prog_bar=True)
+        self.log("total_reward", self.total_reward, logger=True, prog_bar=True)
+        self.log("steps", self.global_step, logger=True, prog_bar=True)
 
         # return OrderedDict({"loss": loss, "log": log, "progress_bar": status})
         return loss

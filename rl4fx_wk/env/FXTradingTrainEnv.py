@@ -154,7 +154,7 @@ class FXTradingEnv(gym.Env):
         action_amount = 0.2
         
         # >0 buy, <0 sell
-        if action_amount < 1:
+        if action == 1:
             # print('buy action')
             # buy amount % of balance in shares
             total_possible = self.balance / current_ask
@@ -167,7 +167,7 @@ class FXTradingEnv(gym.Env):
                 # self.cost_basis = (prev_cost + additional_cost) / (self.position + share_bought)
                 self.position += unit_bought
         
-        elif action_amount < 2:
+        elif action == 2:
             # sell
             # print('sell action')
             shares_sold = self.position #* action_amount * (-1)
@@ -175,7 +175,11 @@ class FXTradingEnv(gym.Env):
             self.position -= shares_sold
             self.total_unit_sold += shares_sold
             self.total_sales_value += shares_sold * current_bid
-            
+
+        elif action == 0:
+            # print('hold')
+            pass
+
         self.net_worth = self.balance + self.position * current_bid
 
         if self.net_worth > self.max_net_worth:
