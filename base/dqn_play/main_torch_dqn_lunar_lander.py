@@ -6,6 +6,7 @@ from utils import plotLearning, show_video, show_video_of_model
 import numpy as np
 import torch as T
 
+
 if __name__ == "__main__":
     env = gym.make("LunarLander-v2")
     agent = Agent(gamma=0.99, epsilon=1.0, batch_size=16, n_actions=4, eps_end=0.01,

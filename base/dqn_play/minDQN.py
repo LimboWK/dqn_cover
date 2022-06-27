@@ -46,9 +46,12 @@ class Agent():
         self.actions_space = [i for i in range(n_actions)]
         self.mem_cntr = 0
 
+        # use target network to improve stability
         self.Q_eval = SimDQN(self.lr, n_actions=n_actions, input_dims=self.input_dims, 
                             fc1_dims=128, fc2_dims=128)
-        
+        self.Q_target = SimDQN(self.lr, n_actions=n_actions, input_dims=self.input_dims, 
+                            fc1_dims=128, fc2_dims=128)
+        self.update_target_step = 200
         # replay
         self.state_memory = np.zeros((self.mem_size, *self.input_dims), dtype=np.float32)
         self.new_state_memory = np.zeros((self.mem_size, *input_dims), dtype=np.float32)
@@ -95,10 +98,14 @@ class Agent():
         action_batch = T.LongTensor(self.action_memory[batch])
 
         q_eval = self.Q_eval.forward(state_batch)[batch_index, action_batch] # q_eval return (q0 ~ qn)
-        q_next = self.Q_eval.forward(new_state_batch) # no target net here
 
+        # update target network
+        if self.mem_cntr % self.update_target_step == 0:
+            self.Q_target.load_state_dict(self.Q_eval.state_dict())
+        
+        q_next = self.Q_target.forward(new_state_batch) # no target net here
         q_next[terminal_batch] = 0.0
-        q_target = reward_batch + self.gamma * T.max(q_next, dim=1)[0] # why q_next
+        q_target = reward_batch + self.gamma * T.max(q_next, dim=1)[0]
         
         loss = self.Q_eval.loss(q_eval, q_target).to(self.Q_eval.device)
 
