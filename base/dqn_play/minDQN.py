@@ -31,7 +31,7 @@ class SimDQN(nn.Module):
 
 class Agent():
     def __init__(self, gamma, epsilon, lr, input_dims, batch_size, n_actions, 
-        max_mem_size=100000, eps_end=0.01, eps_dec=5e-4,
+                 max_mem_size=100000, eps_end=0.01, eps_dec=5e-4, hidden_state=256,
         ) -> None:
         self.gamma = gamma
         self.epsilon = epsilon
@@ -42,15 +42,15 @@ class Agent():
         self.mem_size = max_mem_size
         self.eps_min = eps_end
         self.eps_dec = eps_dec
-
+        self.hidden_state = hidden_state
         self.actions_space = [i for i in range(n_actions)]
         self.mem_cntr = 0
 
         # use target network to improve stability
         self.Q_eval = SimDQN(self.lr, n_actions=n_actions, input_dims=self.input_dims, 
-                            fc1_dims=128, fc2_dims=128)
+                             fc1_dims=self.hidden_state, fc2_dims=self.hidden_state)
         self.Q_target = SimDQN(self.lr, n_actions=n_actions, input_dims=self.input_dims, 
-                            fc1_dims=128, fc2_dims=128)
+                               fc1_dims=self.hidden_state, fc2_dims=self.hidden_state)
         self.update_target_step = 200
         # replay
         self.state_memory = np.zeros((self.mem_size, *self.input_dims), dtype=np.float32)
